@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Online Quiz App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .quiz-container {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      width: 400px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    #options button {
+      display: block;
+      margin: 10px 0;
+      padding: 10px;
+      width: 100%;
+      font-size: 16px;
+      background-color: #eee;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    #options button:hover {
+      background-color: #d3d3d3;
+    }
+
+    #timer {
+      color: #d9534f;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    #result h2 {
+      color: #4CAF50;
+    }
+  </style>
+</head>
+<body>
+  <div class="quiz-container">
+    <h1>Online Quiz App</h1>
+    <div id="quiz-box">
+      <h2 id="question">Loading question...</h2>
+      <p id="timer">Time Left: 15s</p>
+      <div id="options"></div>
+    </div>
+    <div id="result" style="display: none;"></div>
+  </div>
+
+  <script>
+    const quizData = [
+      {
+        question: "What is the capital of India?",
+        options: ["Mumbai", "Delhi", "Hyderabad", "Chennai"],
+        answer: "Delhi"
+      },
+      {
+        question: "Which language runs in the browser?",
+        options: ["Python", "Java", "C++", "JavaScript"],
+        answer: "JavaScript"
+      },
+      {
+        question: "Who is the founder of Microsoft?",
+        options: ["Steve Jobs", "Mark Zuckerberg", "Bill Gates", "Larry Page"],
+        answer: "Bill Gates"
+      }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+    let timer;
+    let timeLeft = 15;
+
+    const questionEl = document.getElementById("question");
+    const optionsEl = document.getElementById("options");
+    const resultEl = document.getElementById("result");
+    const timerEl = document.getElementById("timer");
+
+    function updateTimer() {
+      timerEl.innerText = `Time Left: ${timeLeft}s`;
+    }
+
+    function loadQuestion() {
+      clearInterval(timer);
+      timeLeft = 15;
+      updateTimer();
+
+      const q = quizData[currentQuestion];
+      questionEl.innerText = q.question;
+      optionsEl.innerHTML = "";
+
+      q.options.forEach(option => {
+        const btn = document.createElement("button");
+        btn.innerText = option;
+        btn.onclick = () => {
+          clearInterval(timer);
+          checkAnswer(option);
+        };
+        optionsEl.appendChild(btn);
+      });
+
+      timer = setInterval(() => {
+        timeLeft--;
+        updateTimer();
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          checkAnswer("Time Out");
+        }
+      }, 1000);
+    }
+
+    function checkAnswer(selected) {
+      const correct = quizData[currentQuestion].answer;
+      if (selected === correct) {
+        score++;
+      }
+      currentQuestion++;
+      if (currentQuestion < quizData.length) {
+        loadQuestion();
+      } else {
+        showResult();
+      }
+    }
+
+    function showResult() {
+      document.getElementById("quiz-box").style.display = "none";
+      resultEl.style.display = "block";
+      resultEl.innerHTML = `
+        <h2>Quiz Completed!</h2>
+        <p>Your Score: <strong>${score}</strong> / ${quizData.length}</p>
+      `;
+    }
+
+    window.onload = loadQuestion;
+  </script>
+</body>
+</html>
